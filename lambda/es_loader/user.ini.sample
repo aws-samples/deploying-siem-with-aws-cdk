@@ -1,0 +1,52 @@
+[DEFAULT]
+# デフォルトの設定を上書き
+index_rotation = auto
+
+# ECS 上のコンテナで動作している apache のログを取り込む例
+[apache-ecs]
+index_name = log-web-apache
+via_firelens = True
+s3_key = firelens
+file_format = text
+timestamp_key = datetime
+timestamp_format = %d/%b/%Y:%H:%M:%S %z
+log_pattern = (?P<remotehost>.*) (?P<rfc931>.*) (?P<authuser>.*) \[(?P<datetime>.*?)\] \"(-|(?P<request_method>.*) (?P<request_path>.*) HTTP/(?P<request_version>.*))\" (?P<response_status>.*) (-|(?P<response_bytes>.*))
+
+ecs = http.request.method http.response.body.bytes http.response.status_code http.version source.ip url.path
+http.request.method = request_method
+http.response.body.bytes = response_bytes
+http.response.status_code = response_status
+http.version = request_version
+source.ip = remotehost
+url.path = request_path
+
+static_ecs = @log_type
+@log_type = apache
+
+geoip = source
+
+
+[deepsecurity]
+# https://cloudone.trendmicro.com/docs/workload-security/event-syslog-message-formats/
+# See README for more details
+# https://github.com/aws-samples/siem-on-amazon-elasticsearch/blob/main/docs/contributed/deepsecurity_ja.md
+index = log-deepsecurity
+s3_key = ds_agent
+format = json
+script_ecs = event.action destination.ip destination.port destination.mac destination.bytes source.ip source.port source.mac source.bytes network.transport event.action server.name file.path event.count rule.category host.id event.original
+event.action = act
+destination.ip = dst
+destination.port = dpt
+destination.mac = dmac
+destination.bytes = out
+source.ip = src
+source.port = spt
+source.mac = smac
+source.bytes = in
+network.transport = proto
+server.name = hostname
+file.path = fname
+event.count = cnt
+rule.category = cs1
+host.id = cn1
+event.original = msg

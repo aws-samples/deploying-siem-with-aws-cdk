@@ -1,0 +1,46 @@
+{
+  "app": "npx ts-node --prefer-ts-exts bin/siem-on-es.ts",
+  "context": {
+    "@aws-cdk/aws-apigateway:usagePlanKeyOrderInsensitiveId": true,
+    "@aws-cdk/core:enableStackNameDuplicates": "true",
+    "@aws-cdk/core:stackRelativeExports": "true",
+    "@aws-cdk/aws-ecr-assets:dockerIgnoreSupport": true,
+    "@aws-cdk/aws-secretsmanager:parseOwnedSecretName": true,
+    "@aws-cdk/aws-kms:defaultKeyPolicies": true,
+    "@aws-cdk/aws-s3:grantWriteWithoutAcl": true,
+    "@aws-cdk/aws-ecs-patterns:removeDefaultDesiredCount": true,
+    "@aws-cdk/aws-rds:lowercaseDbIdentifier": true,
+    "@aws-cdk/aws-efs:defaultEncryptionAtRest": true,
+    "@aws-cdk/aws-lambda:recognizeVersionProps": true,
+    "versionReporting": false,
+    "aws-cdk:enableDiffNoFail": "true",
+    "resource_suffix": "",
+    "aes_domain_name": "aes-siem",
+    "s3_bucket_name":{
+      "log": "aes-siem-[AWS Account ID]-log",
+      "snapshot": "aes-siem-[AWS Account ID]-snapshot",
+      "geo": "aes-siem-[AWS Account ID]-geo"
+    },
+    "kms_cmk_alias": "aes-siem-key",
+    "organizations": {
+      "org_id": "",
+      "management_id": "",
+      "member_ids": []
+    },
+    "organizations_eaxmple": {
+      "org_id": "o-12345678",
+      "management_id": "111111111111",
+      "member_ids": ["222222222222", "333333333333"]
+    },
+    "no_organizations": {
+      "aws_accounts": []
+    },
+    "no_organizations_example": {
+      "aws_accounts": ["888888888888", "999999999999"]
+    },
+    "additional_s3_buckets": [],
+    "additional_s3_buckets_sample": ["bucket-log-name", "this-is-not-arn"],
+    "additional_kms_cmks": [],
+    "additional_kms_cmks_sample": ["arn:aws:kms:ap-northeast-1:123456789012:key/abcd12345678-1234", "this-must-be-arn"]
+  }
+}
