@@ -34,7 +34,7 @@ Experimental Support: We may change field type, normalization and something in t
 
 ### 1.1. On Local
    ```shell
-   git clone https://github.com/XXXXXXXX/siem-on-aws.git(TBU)
+   git clone https://github.com/aws-samples/deploying-siem-with-aws-cdk.git
    cd siem-on-aws
    npm install
    ```
@@ -51,7 +51,7 @@ Experimental Support: We may change field type, normalization and something in t
     sudo yum install -y python38 python38-devel git jq
     sudo update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.8 1
     sudo update-alternatives --install /usr/bin/pip3 pip3 /usr/bin/pip3.8 1
-    git clone https://github.com/XXXXXXXX/siem-on-aws.git(TBU)
+    git clone https://github.com/aws-samples/deploying-siem-with-aws-cdk.git
    ```
 
 ## 2. Set environment variables

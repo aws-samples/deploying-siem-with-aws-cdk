@@ -34,7 +34,7 @@ Experimental Support: We may change field type, normalization and something in t
 
 ### 1.1. 로컬에서 구성하기
    ```shell
-   git clone https://github.com/bella-kwon/siem-on-es-aws.git
+   git clone https://github.com/aws-samples/deploying-siem-with-aws-cdk.git
    cd siem-on-es-aws
    npm install
    ```
@@ -52,7 +52,7 @@ cdk 로 배포할 때 20분이상 소요되므로 STS 의 만료시간이 15분�
     sudo yum install -y python38 python38-devel git jq
     sudo update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.8 1
     sudo update-alternatives --install /usr/bin/pip3 pip3 /usr/bin/pip3.8 1
-    git clone https://github.com/XXXXXXXX/siem-on-aws.git(TBU)
+    git clone https://github.com/aws-samples/deploying-siem-with-aws-cdk.git
    ```
 
 ## 2. Account ID 와 Region을 환경변수로 설정합니다.
