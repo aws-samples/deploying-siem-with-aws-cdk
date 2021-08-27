@@ -35,7 +35,7 @@ Experimental Support: We may change field type, normalization and something in t
 ### 1.1. 로컬에서 구성하기
    ```shell
    git clone https://github.com/aws-samples/deploying-siem-with-aws-cdk.git
-   cd siem-on-es-aws
+   cd deploying-siem-with-aws-cdk/
    npm install
    ```
 ### 1.2. EC2 로 CDK 실행환경 구성하기
@@ -73,7 +73,7 @@ Amazon ES의 SIEM 에서 사용하는 Lambda 는 3rd party 라이브러리를 �
 아래 스크립트를 통해 이러한 라이브러리들을 다운로드하고, 로컬에 배포 패키지를 생성합니다.
 
 ```shell
-cd siem-on-es-aws/deployment/
+cd deploying-siem-with-aws-cdk/deployment/
 chmod +x ./step1-build-lambda-pkg.sh && ./step1-build-lambda-pkg.sh
 ```
 
@@ -88,13 +88,6 @@ source ~/.bash_profile
 ```
 
 ## 5. CDK bootstrap
-
-```bash
-cd ..
-cdk bootstrap
-```
-
-* 에러가 발생하여 실행이 실패하는 경우, EC2 인스턴스가 Admin role 을 가지고 있는지 확인합니다.
 
 ### 5-1. cdk.json 항목 내용 업데이트
 
@@ -120,6 +113,15 @@ s3_bucket_name 의 log, snapshot, geo 는 필수로 변경해야 하는 항목�
 cdk context  --j
 ```
 
+### 5-3. cdk bootstrap
+```bash
+cd ..
+cdk bootstrap
+```
+
+* 에러가 발생하여 실행이 실패하는 경우, EC2 인스턴스가 Admin role 을 가지고 있는지 확인합니다.
+
+
 ## 6. CDK 배포
 ### 6-1. without GeoLite2
 cdk 를 배포합니다.
@@ -129,7 +131,7 @@ cdk deploy
 ```
 ### 6-2. with GeoLite2 (optional)
 Kibana에서 아래의 dashboard 에 나오는 것 처럼 Geo ip를 통해 국가 정보를 사용하고 싶다면, 아래 절차를 따릅니다.
-![img_1.png](docs/images/geoip_ex.png)
+![img_1.png](images/geoip_ex.png)
 
 1. 배포할 때 아래와 같이 GeoLite2LicenseKey 파라미터를 사용하여 LicenseKey를 입력합니다.
     ```bash
@@ -144,12 +146,16 @@ Kibana에서 아래의 dashboard 에 나오는 것 처럼 Geo ip를 통해 국�
     1. Test 버튼을 클릭합니다.
     1. S3 condole 로 이동하여 aes-siem-*[AWS Account ID]*-geo 버킷에 GeoLite2 폴더가 생성되었음을 확인합니다.
 
-## 8. ES Access policy 수정
+### 6-3. with AllowedSourceIpAddresses in Elasticsearch Service (optional)
+   ```bash
+   cdk deploy --parameters AllowedSourceIpAddresses="10.0.0.0/8 0.0.0.0" --parameters GeoLite2LicenseKey=xxxxxxxxxxxxxxxx
+   ```
+## 7. ES Access policy 수정
 1. Elasticsearch Service console 로 이동합니다.
 1. aes-siem 도메인 > Actions > Modify access policy 를 선택합니다.
 1. aws:SourceIp 에 허용할 목록을 지정합니다.
 
-## 9. Kibana 접속
+## 8. Kibana 접속
 1. 배포한 CloudFormation 의 Outputs 탭을 확인합니다.
 1. KibanaUrl 에 접속합니다. (8번에서 지정한 sourceIp에서만 접근 가능)
 1. KibanaAdmin/KibanaPassword 로 로그인합니다.
@@ -158,7 +164,7 @@ Kibana에서 아래의 dashboard 에 나오는 것 처럼 Geo ip를 통해 국�
 1. Dashboard 메뉴를 선택합니다. 서비스별로 대쉬보드가 구성되어 있는 것을 확인합니다.
    * 6-1 without GeoLite2로 진행한 경우, 각 대쉬보드에 Geo 관련 Panel 의 데이터는 보이지 않는 것이 정상입니다.
    
-## 10. Cleanup
+## 9. Cleanup
 1. CloudFormation console 로 이동하여 delete stack 을 수행합니다.
 1. 아래 자원은 각각 서비스의 console 로 이동하여 삭제해야 합니다.
    * Amazon ES domain: aes-siem<font color="grey">{resource_suffix}</font>
@@ -168,5 +174,9 @@ Kibana에서 아래의 dashboard 에 나오는 것 처럼 Geo ip를 통해 국�
    * AWS KMS customer-managed key: aes-siem-key<font color="grey">{resource_suffix}</font>
      - <font color="coral">**주의**</font>: CMK(customer-managed key)를 삭제하게 되면 이 키를 이용해 암호화했던 로그를 읽을 수 없게 됩니다.
    
-## 11. Redeploy
+## 10. Redeploy
 * 이 스택을 <font color="coral">재배포</font>하려면, **cdk.json** 의 **resource_suffix** 항목의 값을 수정한 후 6번을 진행합니다.
+
+## License
+This product uses GeoLite2 Data created by MaxMind and is licensed under https://www.maxmind.com/en/geolite2/eula incorporating CC-BY-SA, available from https://www.maxmind.com.
+This product uses ndjson and is licensed under BSD-3-Clause, available from http://ndjson.org/

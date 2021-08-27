@@ -35,7 +35,7 @@ Experimental Support: We may change field type, normalization and something in t
 ### 1.1. On Local
    ```shell
    git clone https://github.com/aws-samples/deploying-siem-with-aws-cdk.git
-   cd siem-on-aws
+   cd deploying-siem-with-aws-cdk/
    npm install
    ```
 ### 1.2. With EC2
@@ -72,7 +72,7 @@ Lambda in this project uses a 3rd party library GeoLite2.
 Execute the below to download the library and create deployment packages locally.
 
 ```shell
-cd siem-on-es-aws/deployment/
+cd deploying-siem-with-aws-cdk/deployment/
 chmod +x ./step1-build-lambda-pkg.sh && ./step1-build-lambda-pkg.sh
 ```
 
@@ -87,13 +87,6 @@ source ~/.bash_profile
 ```
 
 ## 5. CDK bootstrap
-
-```bash
-cd ..
-cdk bootstrap
-```
-
-* If an error occurs, verify that the EC2 instance's role has Administrator.
 
 ### 5-1. Update cdk.json
 
@@ -119,6 +112,15 @@ After running, json is displayed and no errors are present, then normal.
 cdk context  --j
 ```
 
+### 5-3. cdk bootstrap
+```bash
+cd ..
+cdk bootstrap
+```
+
+* If an error occurs, verify that the EC2 instance's role has Administrator.
+
+
 ## 6. CDK deploy
 ### 6-1. without GeoLite2
 
@@ -142,12 +144,17 @@ If you want to use the geo information through GeoIP as shown the dashboard belo
     1. Click Test.
     1. Go to S3 condole and see if GeoLite2 folder is created in aes-siem-*[AWS Account ID]*-geo bucket.
 
-## 8. Update ES Access policy
+### 6-3. with AllowedSourceIpAddresses in Elasticsearch Service (optional)
+   ```bash
+   cdk deploy --parameters AllowedSourceIpAddresses="10.0.0.0/8 0.0.0.0" --parameters GeoLite2LicenseKey=xxxxxxxxxxxxxxxx
+   ```
+
+## 7. Update ES Access policy
 1. Go to Elasticsearch Service console
 1. Click domain aes-siem > Actions > Modify access policy
 1. Specify the list to allow in aws:SourceIp
 
-## 9. Go to Kibana
+## 8. Go to Kibana
 1. See Outputs tab in the stack you delployed
 1. Go to the KibanaUrl (accessible only from sourceIp specified in #8)
 1. Log in with KibanaAdmin/KibanaPassword in the Outputs tab
@@ -156,7 +163,7 @@ If you want to use the geo information through GeoIP as shown the dashboard belo
 1. Select Dashboard Menu and verify that the dashboards are configured per AWS services
    * If you proceed with "#6-1 without GeoLite2", it is normal that the data on Geo related panel is not displayed
    
-## 10. Cleanup
+## 9. Cleanup
 1. Go to CloudFormation console and click 'delete stack'
 1. The resources below must be deleted by moving to the console of the service.
    * Amazon ES domain: aes-siem<font color="grey">{resource_suffix}</font>
@@ -167,7 +174,7 @@ If you want to use the geo information through GeoIP as shown the dashboard belo
      - <font color="coral">**Note**</font>: If you delete the customer-managed key (CMK), you will not be able to read the logs that you encrypted using it.
 
    
-## 11. Redeploy
+## 10. Redeploy
 * To <font color="coral">redeploy this stack</font>, update the **resource_suffix** in **cdk.json** and proceed from #6
 
 ## License
