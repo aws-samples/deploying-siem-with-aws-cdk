@@ -7,7 +7,7 @@ import * as kms from '@aws-cdk/aws-kms';
 import * as iam from '@aws-cdk/aws-iam';
 import * as s3 from '@aws-cdk/aws-s3';
 import * as lambda from '@aws-cdk/aws-lambda';
-import {DeadLetterQueue, IQueue, Queue} from "@aws-cdk/aws-sqs";
+import {DeadLetterQueue, IQueue} from "@aws-cdk/aws-sqs";
 import {SqsEventSource} from '@aws-cdk/aws-lambda-event-sources';
 import {CfnFunction, CfnVersion} from "@aws-cdk/aws-lambda";
 import {LambdaDestination} from '@aws-cdk/aws-s3-notifications';
@@ -270,7 +270,8 @@ export class SiemOnEsStack extends cdk.Stack {
       ]
     });
 
-    let aesSiemDeployRoleForLambdaDocument = new iam.PolicyDocument({
+    // let aesSiemDeployRoleForLambdaDocument =
+    new iam.PolicyDocument({
       statements:[
         ...policydocCreateLoggroupStatements,
         ...policydocCrhelperStatements,
