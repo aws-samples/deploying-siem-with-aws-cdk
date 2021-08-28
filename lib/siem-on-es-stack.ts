@@ -1,7 +1,6 @@
 import * as sns from '@aws-cdk/aws-sns';
 import * as sqs from '@aws-cdk/aws-sqs';
 import * as cdk from '@aws-cdk/core';
-import * as AWS from 'aws-sdk';
 import { RegionInfo, FactName } from '@aws-cdk/region-info';
 import {CfnCustomResource, CfnOutput} from "@aws-cdk/core";
 import * as kms from '@aws-cdk/aws-kms';
@@ -23,20 +22,8 @@ console.log(__version__);
 
 export class SiemOnEsStack extends cdk.Stack {
 
-  checkIamRole(pathprefix:string):boolean {
-    let iamClient = new AWS.IAM();
-    let roleIterator:AWS.Request<AWS.IAM.ListRolesResponse, AWS.AWSError> = iamClient.listRoles({
-      PathPrefix: pathprefix
-    });
-    //@ts-ignore
-    if(roleIterator?.Roles?.length === 1) {
-      return true;
-    }
-    return false;
-  }
-
   makeAccountPrincipals(scope:cdk.Construct, orgMgmtId:string, orgMemberIds:string, noOrgIds:string):AccountPrincipal[] {
-    let awsIds = [orgMgmtId, ,orgMemberIds, noOrgIds].filter(item => item && item !== "");
+    let awsIds = [orgMgmtId, orgMemberIds, noOrgIds].filter(item => item && item !== "");
     let accountPrincipals:AccountPrincipal[] = [];
     for (let awsId in  awsIds) {
       accountPrincipals.push( new iam.AccountPrincipal(awsId) );
@@ -322,19 +309,13 @@ export class SiemOnEsStack extends cdk.Stack {
     });
 
     /**
-     * in VPC
-     */
-    let aesRoleExist = this.checkIamRole('/aws-service-role/es.amazonaws.com/');
-
-
-    /**
      * SQS for es-laoder's DLQ
      */
     let sqsAesSiemDlq = new sqs.Queue(this, 'AesSiemDlq', {
       queueName: 'aes-siem-dlq'+RESOURCE_SUFFIX,
       retentionPeriod: cdk.Duration.days(14)
     });
-    // anonymous class...너도 의심스러워...
+
     let TempDLQ = new class implements DeadLetterQueue {
       readonly maxReceiveCount: number;
       readonly queue: IQueue;
@@ -451,7 +432,7 @@ export class SiemOnEsStack extends cdk.Stack {
     lambdaEsLoader.addEnvironment('ES_ENDPOINT', esEndpoint);
     lambdaEsLoader.addEnvironment('SQS_SPLITTED_LOGS_URL',sqsAesSiemSplittedLogs.queueUrl);
 
-    let lambdaConfigureEs = new lambda.Function(this, 'LambdaConfigureAES', { //lambdaCongigureEsVpcKwargs 생략... TODO
+    let lambdaConfigureEs = new lambda.Function(this, 'LambdaConfigureAES', {
       functionName:'aes-siem-configure-aes'+RESOURCE_SUFFIX,
       runtime:lambda.Runtime.PYTHON_3_8,
       code:lambda.Code.fromAsset('lambda/deploy_es'),
@@ -513,7 +494,7 @@ export class SiemOnEsStack extends cdk.Stack {
           statements: [
             new iam.PolicyStatement({
               actions : ['kms:Decrypt'],
-              resources : additionalKmsCmks//Array.from(new Set(additionalKmsCmks)).sort()    // TODO
+              resources : additionalKmsCmks//Array.from(new Set(additionalKmsCmks)).sort()
             })
           ]
       });
@@ -690,7 +671,7 @@ export class SiemOnEsStack extends cdk.Stack {
     let bucketPolicyGeo1 = new iam.PolicyStatement({
       sid: 'Allow geoip downloader and es-loader to read/write',
       // @ts-ignore
-      principals: [lambdaEsLoader.role, lambdaGeo.role],    // TODO
+      principals: [lambdaEsLoader.role, lambdaGeo.role],
       actions:['s3:PutObject', 's3:GetObject', 's3:DeleteObject'],
       resources: [s3Geo.bucketArn + '/*'],});
     s3Geo.addToResourcePolicy(bucketPolicyGeo1);
